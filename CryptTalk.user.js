@@ -710,7 +710,7 @@ function listenToGTalk()
             elm.innerHTML = "<b>"+pseudoDest+"</b>"+":  "+decrypt(elm.textContent.substring(pseudoDest.length+4+11,elm.textContent.length),document.getElementById("daPass").value);
           }
           
-          
+           
           // 4 : space between the end of the string me and the message. 11 : length of "[encrypted]".
           else if(elm.textContent.substring(me.length+4,me.length+4+11) == "[encrypted]" )
           {
