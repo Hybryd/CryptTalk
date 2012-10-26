@@ -120,7 +120,7 @@ function ButtonClickAction (zEvent)
 
 function getPseudoDest()
 {
-  res = document.title;
+  var res = document.title;
   var idxFinPseudo = res.indexOf("chat - ");
   res = res.substring(0,idxFinPseudo-3);
   return res;
@@ -694,20 +694,30 @@ function listenToGTalk()
 	      // We deal with each message
 	      if(elm.textContent.indexOf("Sent") == -1) // if it is not the hour
 	      {
-          
+
+          // DONT use elm.innerHTML for decryption to avoid XSS attack. Use elm.textContent instead.
+
           // If the message begins with "[encrypted]", we decrypt it
           if(elm.textContent.substring(0,11) == "[encrypted]")
           {
             elm.textContent = decrypt(elm.textContent.substring(11,elm.textContent.length),document.getElementById("daPass").value);
           }
-          else if(elm.textContent.substring(pseudoDest.length+2,pseudoDest.length+2+11) == "[encrypted]")
+          
+          
+          // 4 : space between the end of the pseudoDest and the message. 11 : length of "[encrypted]".
+          else if(elm.textContent.substring(pseudoDest.length+4,pseudoDest.length+4+11) == "[encrypted]")
           {
-            elm.textContent = pseudoDest+": "+decrypt(elm.textContent.substring(pseudoDest.length+2+11,elm.textContent.length),document.getElementById("daPass").value);
+            elm.innerHTML = "<b>"+pseudoDest+"</b>"+":  "+decrypt(elm.textContent.substring(pseudoDest.length+4+11,elm.textContent.length),document.getElementById("daPass").value);
           }
+          
+          
+          // 4 : space between the end of the string me and the message. 11 : length of "[encrypted]".
           else if(elm.textContent.substring(me.length+4,me.length+4+11) == "[encrypted]" )
           {
-            elm.textContent = me+": "+decrypt(elm.textContent.substring(me.length+4+11,elm.textContent.length),document.getElementById("daPass").value);
+            elm.innerHTML = "<b>"+me+"</b>"+": "+decrypt(elm.textContent.substring(me.length+4+11,elm.textContent.length),document.getElementById("daPass").value);
           }
+
+          
 	      }
       }  
     }
