@@ -32,7 +32,6 @@
 // - Add multi-chat option                                                             //
 // - Add other encryption algorithms                                                   //
 // - Add an option to deal with several passwords in the same conversation             //
-// - Automate language detection                                                       //
 /////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -43,8 +42,6 @@
 ////////////////
 
 var period=3000;  // time in ms to refresh decryption in the dialog box
-var me="moi";     // depends on the language used by the client. The keyword has to be changed according to the language ("moi" in french, "me" in english, etc.). A further version should automate the detection of the language. 
-
 
 
 
@@ -67,12 +64,13 @@ document.getElementById ("daButton").addEventListener ("click", ButtonClickActio
 GM_addStyle ( (<><![CDATA[
     #myContainer
     {
+      border-radius: 5px;
+      box-shadow: 0px 4px 4px #1c1a19;
       position:               absolute;
       top:                    0;
       right:                  0;
       font-size:              14px;
       background:             black;
-      border:                 3px outset black;
       margin:                 5px;
       opacity:                0.7;
       z-index:                222;
@@ -110,21 +108,6 @@ function ButtonClickAction (zEvent)
   }
 }
 
-
-
-
-//////////////////////////////////////////////////////////////
-// Returns the destinator's nickname. This nickname is must //
-// not contain the substring "chat - "                      //
-//////////////////////////////////////////////////////////////
-
-function getPseudoDest()
-{
-  var res = document.title;
-  var idxFinPseudo = res.indexOf("chat - ");
-  res = res.substring(0,idxFinPseudo-3);
-  return res;
-}
 
 
 
@@ -655,7 +638,6 @@ document.onkeydown=function(e)
           
           // Add prefix "[encrypted]" for the recognition of an encrypted string
           elm.value = "[encrypted]"+elm.value;
-
         }  
       }
       else
@@ -686,7 +668,6 @@ function listenToGTalk()
     var chatMessage = document.evaluate("//div[@role='chatMessage']/div[text()] | //div[@role='chatMessage']/span[text()]", document, null,XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
     if(chatMessage.snapshotLength > 0)
     {
-      var pseudoDest = getPseudoDest();
       for (var i = chatMessage.snapshotLength - 1; i >= 0 ; i--)
       { 
 	      var elm = chatMessage.snapshotItem(i);
@@ -695,29 +676,21 @@ function listenToGTalk()
 	      if(elm.textContent.indexOf("Sent") == -1) // if it is not the hour
 	      {
 
-          // DONT use elm.innerHTML for decryption to avoid XSS attack. Use elm.textContent instead.
+          // DONT use elm.innerHTML for decryption if you want to avoid XSS attacks. Use elm.textContent instead.
 
-          // If the message begins with "[encrypted]", we decrypt it
-          if(elm.textContent.substring(0,11) == "[encrypted]")
+          var ind=elm.textContent.indexOf("[encrypted]");
+          if(ind > 0)
+          {
+            // To keep the pseudo in bold type, we must put it in the first node and create another one containing the message. Looking for a solution to avoid the creation of the node.
+            var msg = elm.cloneNode(true);
+            msg.textContent = decrypt(elm.textContent.substring(ind+11,elm.textContent.length),document.getElementById("daPass").value);
+            elm.innerHTML   = "<b>"+elm.textContent.substring(0,ind)+"</b>";
+            elm.appendChild(msg);
+          }
+          else if(ind == 0)
           {
             elm.textContent = decrypt(elm.textContent.substring(11,elm.textContent.length),document.getElementById("daPass").value);
           }
-          
-          
-          // 4 : space between the end of the pseudoDest and the message. 11 : length of "[encrypted]".
-          else if(elm.textContent.substring(pseudoDest.length+4,pseudoDest.length+4+11) == "[encrypted]")
-          {
-            elm.innerHTML = "<b>"+pseudoDest+"</b>"+":  "+decrypt(elm.textContent.substring(pseudoDest.length+4+11,elm.textContent.length),document.getElementById("daPass").value);
-          }
-          
-           
-          // 4 : space between the end of the string me and the message. 11 : length of "[encrypted]".
-          else if(elm.textContent.substring(me.length+4,me.length+4+11) == "[encrypted]" )
-          {
-            elm.innerHTML = "<b>"+me+"</b>"+": "+decrypt(elm.textContent.substring(me.length+4+11,elm.textContent.length),document.getElementById("daPass").value);
-          }
-
-          
 	      }
       }  
     }
