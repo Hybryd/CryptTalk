@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           CryptTalk
-// @description    Encrypt and decrypt gTalk conversations using AES algorithm
+// @description    Encrypt and decrypt gTalk conversations using AES algorithm. Firefox version.
 // @include        *mail.google*@gmail.com
 // @version        1.0
 // @copyright      2012, hybryd-
@@ -57,36 +57,40 @@ document.getElementById ("daButton").addEventListener ("click", ButtonClickActio
 
 
 
-
 ////////////////////////////
 // Style of the interface //
 ////////////////////////////
-GM_addStyle ( (<><![CDATA[
-    #myContainer
-    {
-      border-radius: 5px;
-      box-shadow: 0px 4px 4px #1c1a19;
-      position:               absolute;
-      top:                    0;
-      right:                  0;
-      font-size:              14px;
-      background:             black;
-      margin:                 5px;
-      opacity:                0.7;
-      z-index:                222;
-      padding:                5px 20px;
-      color:                  white;
-    }
-    #daButton
-    {
-      cursor:                 pointer;
-    }
-    #myContainer p
-    {
-      color:                  black;
-      background:             white;
-    }
-]]></>).toString () );
+document.getElementById("myContainer").setAttribute("style","border-radius: 5px; box-shadow: 0px 4px 4px #1c1a19; position: absolute; top: 0; right: 0; font-size: 14px; background: black; margin: 5px; opacity: 0.7; z-index: 222; padding: 5px 20px; color: white;");
+document.getElementById("daButton").setAttribute("style","cursor: pointer;");
+document.getElementById("daButton").setAttribute("style","color: black; background: white");
+
+
+//GM_addStyle ( (<><![CDATA[
+//    #myContainer
+//    {
+//      border-radius: 5px;
+//      box-shadow: 0px 4px 4px #1c1a19;
+//      position:               absolute;
+//      top:                    0;
+//      right:                  0;
+//      font-size:              14px;
+//      background:             black;
+//      margin:                 5px;
+//      opacity:                0.7;
+//      z-index:                222;
+//      padding:                5px 20px;
+//      color:                  white;
+//    }
+//    #daButton
+//    {
+//      cursor:                 pointer;
+//    }
+//    #myContainer p
+//    {
+//      color:                  black;
+//      background:             white;
+//    }
+//]]></>).toString () );
 
 
 
